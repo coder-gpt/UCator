@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UCator // Source Core Modeler</title>
     <style>
-        body { background: #0a0a0c; color: #9090a0; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 12px; line-height: 1.5; margin: 0; padding: 20px; }
+        body { background: #0a0a0c; color: #9090a0; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 12px; line-height: 1.5; margin: 0; padding: 20px; position: relative; min-height: 100vh; box-sizing: border-box; }
         .container { max-width: 800px; margin: 0 auto; }
         header { border-bottom: 1px dashed #2a2a35; padding-bottom: 15px; margin-bottom: 20px; }
         h1 { color: #d0d0d5; font-size: 14px; font-weight: 700; margin: 0 0 5px 0; text-transform: uppercase; letter-spacing: 1px; }
@@ -16,7 +16,7 @@
         label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #707080; }
         textarea { background: #111115; border: 1px solid #22222a; color: #a0c090; font-family: inherit; font-size: 12px; padding: 10px; height: 280px; resize: none; outline: none; box-sizing: border-box; width: 100%; }
         textarea:focus { border-color: #444455; color: #b0d0a0; }
-        textarea[readonly] { color: #80a0c0; background: #0e0e12; }
+        textarea[readonly] { color: #80a0c0; background: #0e0e12; filter: blur(4px); transition: filter 0.3s ease; }
         .controls { margin-top: 10px; display: flex; flex-direction: column; gap: 10px; }
         .console-log { background: #000; border: 1px solid #1a1a22; padding: 10px; height: 80px; overflow-y: auto; font-size: 11px; color: #666; }
         .console-log .entry { margin-bottom: 2px; }
@@ -24,9 +24,27 @@
         button { background: #1c1c24; border: 1px solid #323242; color: #c0c0c5; cursor: pointer; font-family: inherit; font-size: 11px; font-weight: bold; padding: 10px 20px; text-transform: uppercase; transition: all 0.1s ease; }
         button:hover { background: #252530; border-color: #444455; color: #fff; }
         button:active { background: #111115; }
-        .btn-copy { background: transparent; border-color: #22222a; color: #666; }
-        .btn-copy:hover { border-color: #333344; color: #999; }
+        .btn-copy { background: transparent; border-color: #22222a; color: #666; display: none; }
+        
+        /* Loading Overlay System */
+        #loader-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,5,7,0.95); z-index: 1000; align-items: center; justify-content: center; flex-direction: column; }
+        .loader-terminal { width: 90%; max-width: 450px; background: #000; border: 1px solid #22222a; padding: 15px; box-sizing: border-box; }
+        .loader-text { color: #666; font-size: 11px; margin-bottom: 4px; }
+        .loader-bar { width: 100%; height: 2px; background: #111; position: relative; overflow: hidden; margin-top: 10px; }
+        .loader-progress { width: 0%; height: 100%; background: #5f875f; transition: width 0.1s linear; }
+
+        /* Gatekeeper Modal Lock */
+        #ad-gate { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,5,7,0.85); z-index: 999; align-items: center; justify-content: center; }
+        .gate-box { background: #111115; border: 1px solid #323242; padding: 25px; text-align: center; max-width: 380px; width: 90%; box-sizing: border-box; }
+        .gate-box h2 { color: #d0d0d5; font-size: 12px; text-transform: uppercase; margin: 0 0 10px 0; letter-spacing: 1px; }
+        .gate-box p { color: #666; font-size: 11px; margin: 0 0 20px 0; }
+        .gate-btn { background: #5f875f; border: 1px solid #7ea37e; color: #fff; width: 100%; box-sizing: border-box; }
+        .gate-btn:hover { background: #6f976f; }
     </style>
+    <script>
+        // Replace this demo variable with your real Ad Network direct link URL later
+        var rewarded_ad_url = "https://www.google.com"; 
+    </script>
 </head>
 <body>
 
@@ -43,13 +61,13 @@
         </div>
         <div class="panel">
             <label for="out">compiled_output</label>
-            <textarea id="out" readonly spellcheck="false" placeholder="-- Structural mutation output..."></textarea>
+            <textarea id="out" readonly spellcheck="false" placeholder="-- Output locked. Complete verification steps below..."></textarea>
         </div>
     </div>
 
     <div class="controls">
-        <button onclick="processScript()">Execute Structural Mutation</button>
-        <button class="btn-copy" onclick="copyResult()">Copy to Clipboard</button>
+        <button id="exec-btn" onclick="processScript()">Execute Structural Mutation</button>
+        <button id="copy-btn" class="btn-copy" onclick="copyResult()">Copy to Clipboard</button>
         
         <label>System Terminal Output</label>
         <div class="console-log" id="log">
@@ -58,8 +76,23 @@
     </div>
 </div>
 
+<div id="loader-overlay">
+    <div class="loader-terminal">
+        <div id="terminal-text" class="loader-text">> Booting local environment core...</div>
+        <div class="loader-bar"><div id="p-bar" class="loader-progress"></div></div>
+    </div>
+</div>
+
+<div id="ad-gate">
+    <div class="gate-box">
+        <h2>Output Stream Locked</h2>
+        <p>To unlock and export your mutated asset token array, support the engine platform by interacting with the short sponsor ad link.</p>
+        <button class="gate-btn" onclick="triggerVerificationAd()">Watch Ad & Unlock Code</button>
+    </div>
+</div>
+
 <script>
-    const _0x4fbc = ['log', 'value', 'trim', 'Error:\x20No\x20code\x20stream\x20detected\x20in\x20src_input.', 'error', 'Parser\x20target\x20acquired.\x20Compressing\x20token\x20streams...', 'replace', 'match', 'length', 'includes', 'forEach', 'push', 'out', 'success', 'Structural\x20mutation\x20completed\x20successfully.', 'select', 'setSelectionRange', 'writeText', 'clipboard', 'navigator', 'Output\x20data\x20block\x20exported\x20to\x20clipboard\x20buffer.', 'createElement', 'div', 'className', 'entry\x20', 'innerText', 'toLocaleTimeString', 'appendChild', 'scrollTop', 'scrollHeight', 'getElementById', 'src'];
+    const _0x4fbc = ['log', 'value', 'trim', 'Error:\x20No\x20code\x20stream\x20detected\x20in\x20src_input.', 'error', 'Parser\x20target\x20acquired.\x20Compressing\x20token\x20streams...', 'replace', 'match', 'length', 'includes', 'forEach', 'push', 'out', 'success', 'Structural\x20mutation\x20completed\x20successfully.', 'select', 'setSelectionRange', 'writeText', 'clipboard', 'navigator', 'Output\x20data\x20block\x20exported\x20to\x20clipboard\x20buffer.', 'createElement', 'div', 'className', 'entry\x20', 'innerText', 'toLocaleTimeString', 'appendChild', 'scrollTop', 'scrollHeight', 'getElementById', 'src', 'style', 'display', 'flex', 'none', 'width', 'terminal-text', 'p-bar', 'loader-overlay', 'ad-gate', 'copy-btn', 'filter', 'blur(0px)'];
     (function(_0x2d46e2, _0x4fbc75) {
         const _0x530864 = function(_0x56a422) {
             while (--_0x56a422) { _0x2d46e2['push'](_0x2d46e2['shift']()); }
@@ -71,6 +104,8 @@
         let _0x530864 = _0x4fbc[_0x2d46e2];
         return _0x530864;
     };
+
+    var _storedOutput = "";
 
     function logEvent(_0x217bb9, _0x4bb5df = '') {
         const _0x228731 = document[_0x5308('0x1e')](_0x5308('0x1d'));
@@ -87,9 +122,43 @@
             logEvent(_0x5308('0x3'), _0x5308('0x4'));
             return;
         }
+
+        // Show compile matrix loader overlay screen
+        document[_0x5308('0x1e')](_0x5308('0x25'))[_0x5308('0x20')][_0x5308('0x21')] = _0x5308('0x22');
+        let currentProgress = 0;
+        let tText = document[_0x5308('0x1e')](_0x5308('0x23'));
+        let pBar = document[_0x5308('0x1e')](_0x5308('0x24'));
+
+        let simulationStages = [
+            {p: 15, t: "> Fetching raw source instruction pointers..."},
+            {p: 40, t: "> Initializing structural mutation algorithms..."},
+            {p: 70, t: "> Stripping scope identifiers & comments..."},
+            {p: 90, t: "> Generating local token collisions matrix..."},
+            {p: 100, t: "> Core pipeline processing complete."}
+        ];
+
+        let stageIdx = 0;
+        let internalClock = setInterval(function() {
+            currentProgress += 2;
+            pBar[_0x5308('0x20')][_0x5308('0x23')] = currentProgress + "%";
+            
+            if(simulationStages[stageIdx] && currentProgress >= simulationStages[stageIdx].p) {
+                tText[_0x5308('0x19')] = simulationStages[stageIdx].t;
+                stageIdx++;
+            }
+
+            if(currentProgress >= 100) {
+                clearInterval(internalClock);
+                document[_0x5308('0x1e')](_0x5308('0x25'))[_0x5308('0x20')][_0x5308('0x21')] = _0x5308('0x23');
+                triggerAdWallInterlock(_0x3b218d);
+            }
+        }, 40);
+    }
+
+    function triggerAdWallInterlock(_sourceIn) {
         logEvent(_0x5308('0x5'));
-        _0x3b218d = _0x3b218d[_0x5308('0x6')](/--\[\[[\s\S]*?\]\]/g, '')[_0x5308('0x6')](/--.*$/gm, '');
-        const _0x560835 = _0x3b218d[_0x5308('0x7')](/\b[a-zA-Z_][a-zA-Z0-9_]*\b/g) || [];
+        let processedCode = _sourceIn[_0x5308('0x6')](/--\[\[[\s\S]*?\]\]/g, '')[_0x5308('0x6')](/--.*$/gm, '');
+        const _0x560835 = processedCode[_0x5308('0x7')](/\b[a-zA-Z_][a-zA-Z0-9_]*\b/g) || [];
         const _0x12dc59 = [...new Set(_0x560835)];
         const _0x26be39 = ['local', 'function', 'end', 'if', 'then', 'else', 'elseif', 'for', 'in', 'pairs', 'ipairs', 'do', 'while', 'return', 'true', 'false', 'nil', 'print', 'tostring', 'assert', 'load', 'string', 'table', 'math', 'pcall'];
         let _0x4f128b = {};
@@ -99,13 +168,31 @@
                 _0x4f128b[_0x323e20] = 'l_' + _0x1d8a1c++;
             }
         });
-        let _0x203be4 = _0x3b218d;
         for (let _0x4b7863 in _0x4f128b) {
             const _0x4f9449 = new RegExp('\\b' + _0x4b7863 + '\\b', 'g');
-            _0x203be4 = _0x203be4[_0x5308('0x6')](_0x4f9449, _0x4f128b[_0x4b7863]);
+            processedCode = processedCode[_0x5308('0x6')](_0x4f9449, _0x4f128b[_0x4b7863]);
         }
-        _0x203be4 = _0x203be4[_0x5308('0x6')](/\s+/g, '\x20')[_0x5308('0x6')](/([\(\)\{\}\=\+\-\*\/,;:<>])/g, '$1')[_0x5308('0x2')]();
-        document[_0x5308('0x1e')](_0x5308('0xc'))[_0x5308('0x1')] = _0x203be4;
+        processedCode = processedCode[_0x5308('0x6')](/\s+/g, '\x20')[_0x5308('0x6')](/([\(\)\{\}\=\+\-\*\/,;:<>])/g, '$1')[_0x5308('0x2')]();
+        
+        _storedOutput = processedCode;
+        
+        // Block workspace interface & show ad gate prompt
+        document[_0x5308('0x1e')](_0x5308('0x26'))[_0x5308('0x20')][_0x5308('0x21')] = _0x5308('0x22');
+    }
+
+    function triggerVerificationAd() {
+        // 1. Launch ad redirect link in secondary browser frame tab
+        window.open(rewarded_ad_url, '_blank');
+        
+        // 2. Clear out the verification barrier layers completely
+        document[_0x5308('0x1e')](_0x5308('0x26'))[_0x5308('0x20')][_0x5308('0x21')] = _0x5308('0x23');
+        
+        // 3. Inject compilation token values into unlocked textbox pane
+        let targetOutBox = document[_0x5308('0x1e')](_0x5308('0xc'));
+        targetOutBox[_0x5308('0x1')] = _storedOutput;
+        targetOutBox[_0x5308('0x20')][_0x5308('0x29')] = _0x5308('0x2a');
+        
+        document[_0x5308('0x1e')](_0x5308('0x27'))[_0x5308('0x20')][_0x5308('0x21')] = _0x5308('0x22');
         logEvent(_0x5308('0xe'), _0x5308('0xd'));
     }
 
@@ -114,7 +201,7 @@
         if (!_0x39bf62[_0x5308('0x1')]) return;
         _0x39bf62[_0x5308('0xf')]();
         _0x39bf62[_0x5308('0x10')](0, 0x1869f);
-        _0x45f8cb = window[_0x5308('0x13')][_0x5308('0x12')](_0x39bf62[_0x5308('0x1')]);
+        window[_0x5308('0x13')][_0x5308('0x12')](_0x39bf62[_0x5308('0x1')]);
         logEvent(_0x5308('0x14'));
     }
 </script>
