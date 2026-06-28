@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCator // Source Core Modeler</title>
+    <style>
+        body { background: #0a0a0c; color: #9090a0; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 12px; line-height: 1.5; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        header { border-bottom: 1px dashed #2a2a35; padding-bottom: 15px; margin-bottom: 20px; }
+        h1 { color: #d0d0d5; font-size: 14px; font-weight: 700; margin: 0 0 5px 0; text-transform: uppercase; letter-spacing: 1px; }
+        .meta { font-size: 11px; color: #555565; }
+        .grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        @media (min-width: 600px) { .grid { grid-template-columns: 1fr 1fr; } }
+        .panel { display: flex; flex-direction: column; gap: 8px; }
+        label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #707080; }
+        textarea { background: #111115; border: 1px solid #22222a; color: #a0c090; font-family: inherit; font-size: 12px; padding: 10px; height: 280px; resize: none; outline: none; box-sizing: border-box; width: 100%; }
+        textarea:focus { border-color: #444455; color: #b0d0a0; }
+        textarea[readonly] { color: #80a0c0; background: #0e0e12; }
+        .controls { margin-top: 10px; display: flex; flex-direction: column; gap: 10px; }
+        .console-log { background: #000; border: 1px solid #1a1a22; padding: 10px; height: 80px; overflow-y: auto; font-size: 11px; color: #666; }
+        .console-log .entry { margin-bottom: 2px; }
+        .console-log .success { color: #5f875f; }
+        button { background: #1c1c24; border: 1px solid #323242; color: #c0c0c5; cursor: pointer; font-family: inherit; font-size: 11px; font-weight: bold; padding: 10px 20px; text-transform: uppercase; transition: all 0.1s ease; }
+        button:hover { background: #252530; border-color: #444455; color: #fff; }
+        button:active { background: #111115; }
+        .btn-copy { background: transparent; border-color: #22222a; color: #666; }
+        .btn-copy:hover { border-color: #333344; color: #999; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>UCator // Source Core Modeler</h1>
+        <div class="meta">Build: 2026.06.28 // Local Engine: Standalone Asset Protection</div>
+    </header>
+
+    <div class="grid">
+        <div class="panel">
+            <label for="src">src_input</label>
+            <textarea id="src" spellcheck="false" placeholder="-- Paste raw Lua script here..."></textarea>
+        </div>
+        <div class="panel">
+            <label for="out">compiled_output</label>
+            <textarea id="out" readonly spellcheck="false" placeholder="-- Structural mutation output..."></textarea>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button onclick="processScript()">Execute Structural Mutation</button>
+        <button class="btn-copy" onclick="copyResult()">Copy to Clipboard</button>
+        
+        <label>System Terminal Output</label>
+        <div class="console-log" id="log">
+            <div class="entry">System initialized. Awaiting source feed...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const _0x4fbc = ['log', 'value', 'trim', 'Error:\x20No\x20code\x20stream\x20detected\x20in\x20src_input.', 'error', 'Parser\x20target\x20acquired.\x20Compressing\x20token\x20streams...', 'replace', 'match', 'length', 'includes', 'forEach', 'push', 'out', 'success', 'Structural\x20mutation\x20completed\x20successfully.', 'select', 'setSelectionRange', 'writeText', 'clipboard', 'navigator', 'Output\x20data\x20block\x20exported\x20to\x20clipboard\x20buffer.', 'createElement', 'div', 'className', 'entry\x20', 'innerText', 'toLocaleTimeString', 'appendChild', 'scrollTop', 'scrollHeight', 'getElementById', 'src'];
+    (function(_0x2d46e2, _0x4fbc75) {
+        const _0x530864 = function(_0x56a422) {
+            while (--_0x56a422) { _0x2d46e2['push'](_0x2d46e2['shift']()); }
+        };
+        _0x530864(++_0x4fbc75);
+    }(_0x4fbc, 0x1a7));
+    const _0x5308 = function(_0x2d46e2, _0x4fbc75) {
+        _0x2d46e2 = _0x2d46e2 - 0x0;
+        let _0x530864 = _0x4fbc[_0x2d46e2];
+        return _0x530864;
+    };
+
+    function logEvent(_0x217bb9, _0x4bb5df = '') {
+        const _0x228731 = document[_0x5308('0x1e')](_0x5308('0x1d'));
+        const _0x5466c4 = document[_0x5308('0x15')](_0x5308('0x16'));
+        _0x5466c4[_0x5308('0x17')] = _0x5308('0x18') + _0x4bb5df;
+        _0x5466c4[_0x5308('0x19')] = '[' + new Date()[_0x5308('0x1a')]() + ']\x20' + _0x217bb9;
+        _0x228731[_0x5308('0x1b')](_0x5466c4);
+        _0x228731[_0x5308('0x1c')] = _0x228731[_0x5308('0x1d')];
+    }
+
+    function processScript() {
+        let _0x3b218d = document[_0x5308('0x1e')](_0x5308('0x1f'))[_0x5308('0x1')][_0x5308('0x2')]();
+        if (!_0x3b218d) {
+            logEvent(_0x5308('0x3'), _0x5308('0x4'));
+            return;
+        }
+        logEvent(_0x5308('0x5'));
+        _0x3b218d = _0x3b218d[_0x5308('0x6')](/--\[\[[\s\S]*?\]\]/g, '')[_0x5308('0x6')](/--.*$/gm, '');
+        const _0x560835 = _0x3b218d[_0x5308('0x7')](/\b[a-zA-Z_][a-zA-Z0-9_]*\b/g) || [];
+        const _0x12dc59 = [...new Set(_0x560835)];
+        const _0x26be39 = ['local', 'function', 'end', 'if', 'then', 'else', 'elseif', 'for', 'in', 'pairs', 'ipairs', 'do', 'while', 'return', 'true', 'false', 'nil', 'print', 'tostring', 'assert', 'load', 'string', 'table', 'math', 'pcall'];
+        let _0x4f128b = {};
+        let _0x1d8a1c = 0;
+        _0x12dc59[_0x5308('0xa')](function(_0x323e20) {
+            if (!_0x26be39[_0x5308('0x9')](_0x323e20) && _0x323e20[_0x5308('0x8')] > 2) {
+                _0x4f128b[_0x323e20] = 'l_' + _0x1d8a1c++;
+            }
+        });
+        let _0x203be4 = _0x3b218d;
+        for (let _0x4b7863 in _0x4f128b) {
+            const _0x4f9449 = new RegExp('\\b' + _0x4b7863 + '\\b', 'g');
+            _0x203be4 = _0x203be4[_0x5308('0x6')](_0x4f9449, _0x4f128b[_0x4b7863]);
+        }
+        _0x203be4 = _0x203be4[_0x5308('0x6')](/\s+/g, '\x20')[_0x5308('0x6')](/([\(\)\{\}\=\+\-\*\/,;:<>])/g, '$1')[_0x5308('0x2')]();
+        document[_0x5308('0x1e')](_0x5308('0xc'))[_0x5308('0x1')] = _0x203be4;
+        logEvent(_0x5308('0xe'), _0x5308('0xd'));
+    }
+
+    function copyResult() {
+        const _0x39bf62 = document[_0x5308('0x1e')](_0x5308('0xc'));
+        if (!_0x39bf62[_0x5308('0x1')]) return;
+        _0x39bf62[_0x5308('0xf')]();
+        _0x39bf62[_0x5308('0x10')](0, 0x1869f);
+        _0x45f8cb = window[_0x5308('0x13')][_0x5308('0x12')](_0x39bf62[_0x5308('0x1')]);
+        logEvent(_0x5308('0x14'));
+    }
+</script>
+
+</body>
+</html>
